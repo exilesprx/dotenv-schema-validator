@@ -56,13 +56,13 @@ dotenv-validate -s .schema.env .env
 On success:
 
 ```
-✅ .env.production is valid
+✓ .env.production is valid
 ```
 
 On failure:
 
 ```
-❌ .env.staging failed validation:
+✗ .env.staging failed validation:
   - API_KEY: must be at least 32 characters (got 12)
   - PORT: must be <= 65535 (got 99999)
   - APP_ENV: must be one of (development, staging, production) (got 'prod')
@@ -71,7 +71,7 @@ On failure:
 On unreadable file:
 
 ```
-❌ Failed to load '.env.missing': [Errno 2] No such file or directory
+✗ Failed to load '.env.missing': [Errno 2] No such file or directory
 ```
 
 All errors for a file are reported together. When validating multiple files, validation continues even if one fails.
