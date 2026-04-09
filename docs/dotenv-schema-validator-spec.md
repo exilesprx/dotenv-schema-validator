@@ -117,6 +117,18 @@ Build the project incrementally, completing and verifying each phase before movi
 - Install as a tool: `uv tool install .`
 - End-to-end test with a valid and an invalid `.env` file, confirming correct output and exit codes
 
+### Phase 7 — README
+
+- Update `README.md` to accurately document the project, including:
+  - Project description
+  - Installation instructions (`uv tool install .`)
+  - CLI usage and flags
+  - `.schema.env` format with all supported types, constraints, and the `optional|` prefix
+  - Example `.schema.env` and `.env` files
+  - Example CLI output (success, failure, unreadable file)
+  - Development setup (clone, `uv` commands for deps, tests, linting)
+- **Verify:** README renders correctly and all commands shown are accurate
+
 ---
 
 ## CLI Behaviour
