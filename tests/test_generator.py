@@ -73,7 +73,7 @@ def test_cli_prints_success_message(tmp_path: pytest.TempPathFactory) -> None:
     result = runner.invoke(main, [str(env_file), "--output", str(output_file)])
 
     assert result.exit_code == 0
-    assert f"✅ Schema written to {output_file}" in result.output
+    assert f"✓ Schema written to {output_file}" in result.output
 
 
 def test_cli_exits_with_code_1_when_env_file_missing(
@@ -86,7 +86,7 @@ def test_cli_exits_with_code_1_when_env_file_missing(
     result = runner.invoke(main, [str(missing), "--output", str(output_file)])
 
     assert result.exit_code == 1
-    assert "❌" in result.output
+    assert "✗" in result.output
 
 
 def test_cli_exits_with_code_1_when_env_file_malformed(
@@ -100,4 +100,4 @@ def test_cli_exits_with_code_1_when_env_file_malformed(
     result = runner.invoke(main, [str(env_file), "--output", str(output_file)])
 
     assert result.exit_code == 1
-    assert "❌" in result.output
+    assert "✗" in result.output

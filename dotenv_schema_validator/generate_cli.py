@@ -21,7 +21,7 @@ def main(output: str, env_file: str) -> None:
     try:
         env = parse_env_file(env_file)
     except (ValueError, OSError) as e:
-        click.echo(f"❌ Failed to load '{env_file}': {e}")
+        click.echo(f"✗ Failed to load '{env_file}': {e}")
         sys.exit(1)
 
     schema_content = generate_schema(env)
@@ -30,7 +30,7 @@ def main(output: str, env_file: str) -> None:
         with open(output, "w") as f:
             f.write(schema_content)
     except OSError as e:
-        click.echo(f"❌ Failed to write '{output}': {e}")
+        click.echo(f"✗ Failed to write '{output}': {e}")
         sys.exit(1)
 
-    click.echo(f"✅ Schema written to {output}")
+    click.echo(f"✓ Schema written to {output}")

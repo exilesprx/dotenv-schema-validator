@@ -21,12 +21,12 @@ def main(schema: str, env_files: tuple[str, ...]) -> None:
     try:
         parsed_schema = parse_schema_file(schema)
     except (ValueError, FileNotFoundError, OSError) as e:
-        click.echo(f"❌ Failed to load schema '{schema}': {e}")
+        click.echo(f"✗ Failed to load schema '{schema}': {e}")
         sys.exit(1)
 
     if not parsed_schema:
         click.echo(
-            "⚠️  Warning: schema file is empty — all keys will be ignored",
+            "⚠ Warning: schema file is empty -- all keys will be ignored",
             err=True,
         )
 
@@ -36,17 +36,17 @@ def main(schema: str, env_files: tuple[str, ...]) -> None:
         try:
             env = parse_env_file(env_file)
         except (ValueError, FileNotFoundError, OSError) as e:
-            click.echo(f"❌ Failed to load '{env_file}': {e}")
+            click.echo(f"✗ Failed to load '{env_file}': {e}")
             any_failed = True
             continue
 
         result = validate(env, parsed_schema)
 
         if result.valid:
-            click.echo(f"✅ {env_file} is valid")
+            click.echo(f"✓ {env_file} is valid")
         else:
             any_failed = True
-            click.echo(f"❌ {env_file} failed validation:")
+            click.echo(f"✗ {env_file} failed validation:")
             for error in result.errors:
                 click.echo(str(error))
 

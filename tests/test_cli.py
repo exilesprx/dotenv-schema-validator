@@ -14,5 +14,5 @@ def test_empty_schema_warns_and_exits_zero(tmp_path: pytest.TempPathFactory) -> 
     result = runner.invoke(main, ["--schema", str(schema_file), str(env_file)])
 
     assert result.exit_code == 0
-    assert "⚠️" in result.output
+    assert "⚠" in result.output
     assert "empty" in result.output

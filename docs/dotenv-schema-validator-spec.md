@@ -143,7 +143,7 @@ Build the project incrementally, completing and verifying each phase before movi
   - Required flag: `--output` / `-o` (path to write the generated `.schema.env` file)
   - Loads the `.env` file using `parse_env_file()`, calls `generate_schema()`, and writes the result to the output path
   - Catches `ValueError` and `OSError` from parsing/writing and prints a clean error message, then exits with code `1`
-  - On success, prints: `✅ Schema written to <output_path>`
+  - On success, prints: `✓ Schema written to <output_path>`
 - Add new entry point in `pyproject.toml`: `dotenv-schema-generate = "dotenv_schema_validator.generate_cli:main"`
 - Write `tests/test_generator.py`
 - **Verify:** `uv run dotenv-schema-generate --help` shows correct usage; `uv run pytest` passes; `uv run mypy dotenv_schema_validator` passes; `uv run ruff format --check dotenv_schema_validator tests` reports no changes needed
@@ -176,18 +176,18 @@ dotenv-validate --schema <schema_file> <env_file> [<env_file> ...]
 
 On success:
 ```
-✅ .env.production is valid
+✓ .env.production is valid
 ```
 
 On empty schema (warning, still exits 0):
 ```
-⚠️  Warning: schema file is empty — all keys will be ignored
-✅ .env.production is valid
+⚠ Warning: schema file is empty -- all keys will be ignored
+✓ .env.production is valid
 ```
 
 On failure:
 ```
-❌ .env.staging failed validation:
+✗ .env.staging failed validation:
   - API_KEY: must be at least 32 characters (got 12)
   - PORT: must be <= 65535 (got 99999)
   - APP_ENV: must be one of (development, staging, production) (got 'prod')
@@ -195,7 +195,7 @@ On failure:
 
 On unreadable file:
 ```
-❌ Failed to load '.env.missing': [Errno 2] No such file or directory
+✗ Failed to load '.env.missing': [Errno 2] No such file or directory
 ```
 
 - All errors for a file are reported together — do not stop at the first error
@@ -334,7 +334,7 @@ Exports:
 - Accepts a single positional `env_file` argument and a required `--output` / `-o` flag
 - Parses the env file using `parse_env_file()`, generates a schema using `generate_schema()`, and writes the result to the output path
 - Catches `ValueError` and `OSError` and prints a clean error message, then exits with code `1`
-- On success, prints: `✅ Schema written to <output_path>`
+- On success, prints: `✓ Schema written to <output_path>`
 
 ---
 
@@ -450,7 +450,7 @@ testpaths = ["tests"]
 - `enum` passes when value is in the list
 - `enum` fails when value is not in the list, and error message includes the actual value
 - Multiple errors across keys are all reported in a single `ValidationResult`
-- Empty schema file causes a warning message on stderr and exits with code `0`
+- Empty schema file prints a warning containing "⚠" and "empty", and exits with code `0`
 
 ### `test_cli.py`
 
@@ -461,6 +461,6 @@ testpaths = ["tests"]
 - Output ends with a trailing newline
 - An empty dict produces an empty string (just a trailing newline — i.e., `""` or `"\n"`)
 - CLI writes a `.schema.env` file to the output path on success
-- CLI prints `✅ Schema written to <output_path>` on success
+- CLI prints `✓ Schema written to <output_path>` on success
 - CLI exits with code `1` and prints an error when the env file does not exist
 - CLI exits with code `1` and prints an error when the env file is malformed
