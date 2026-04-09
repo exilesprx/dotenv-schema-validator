@@ -24,6 +24,12 @@ def main(schema: str, env_files: tuple[str, ...]) -> None:
         click.echo(f"❌ Failed to load schema '{schema}': {e}")
         sys.exit(1)
 
+    if not parsed_schema:
+        click.echo(
+            "⚠️  Warning: schema file is empty — all keys will be ignored",
+            err=True,
+        )
+
     any_failed = False
 
     for env_file in env_files:

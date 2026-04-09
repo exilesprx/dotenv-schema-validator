@@ -160,6 +160,12 @@ On success:
 ✅ .env.production is valid
 ```
 
+On empty schema (warning, still exits 0):
+```
+⚠️  Warning: schema file is empty — all keys will be ignored
+✅ .env.production is valid
+```
+
 On failure:
 ```
 ❌ .env.staging failed validation:
@@ -407,3 +413,4 @@ testpaths = ["tests"]
 - `enum` passes when value is in the list
 - `enum` fails when value is not in the list, and error message includes the actual value
 - Multiple errors across keys are all reported in a single `ValidationResult`
+- Empty schema file causes a warning message on stderr and exits with code `0`
