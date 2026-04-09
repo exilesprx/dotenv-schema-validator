@@ -184,6 +184,7 @@ ANOTHER='single quoted'
 - Values may optionally be wrapped in double or single quotes — strip them if present
 - A line without `=` is a parse error: raise `ValueError` with the line number and content
 - Keys and values must be stripped of surrounding whitespace
+- Keys must match `^[A-Z0-9_]+$` (uppercase letters, digits, and underscores only); a key containing lowercase letters is a parse error: raise `ValueError` with the line number and key
 
 ---
 
@@ -207,6 +208,7 @@ ADMIN_EMAIL=optional|email
 - Each line has the format `KEY=rule`
 - A line without `=` is a parse error
 - Keys and rules must be stripped of surrounding whitespace
+- Keys must match `^[A-Z0-9_]+$` (uppercase letters, digits, and underscores only); a key containing lowercase letters is a parse error: raise `ValueError` with the key
 
 ### Rule Syntax
 
@@ -309,6 +311,8 @@ Error messages must be specific and include the actual value where relevant:
 | Enum mismatch | `must be one of (development, staging, production) (got 'prod')` |
 | String too short | `must be at least 32 characters (got 12)` |
 | String too long | `must be at most 10 characters (got 15)` |
+| Lowercase key in `.env` | `Line N: key 'port' must be uppercase (A-Z, 0-9, _)` |
+| Lowercase key in `.schema.env` | `key 'port' must be uppercase (A-Z, 0-9, _)` |
 
 ---
 
@@ -360,12 +364,14 @@ testpaths = ["tests"]
 - Strips surrounding quotes from values
 - Skips comments and blank lines
 - Raises `ValueError` on a line with no `=`
+- Raises `ValueError` when a `.env` key is not uppercase (e.g. `port=8080`)
 - Parses a required `string` rule
 - Parses an `optional|bool` rule
 - Parses `string(min=32,max=64)` constraints correctly
 - Parses `enum(development,staging,production)` values correctly
 - Raises `ValueError` on an unrecognised type
 - Raises `ValueError` on `enum` with no values
+- Raises `ValueError` when a `.schema.env` key is not uppercase
 
 ### `test_validator.py`
 
