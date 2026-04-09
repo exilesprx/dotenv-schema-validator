@@ -15,6 +15,7 @@ dependencies = [
 
 [project.scripts]
 dotenv-validate = "dotenv_schema_validator.cli:main"
+dotenv-schema-generate = "dotenv_schema_validator.generate_cli:main"
 
 [dependency-groups]
 dev = [

@@ -16,11 +16,14 @@ dotenv-schema-validator/
 │   ├── __init__.py
 │   ├── parser.py
 │   ├── validator.py
-│   └── cli.py
+│   ├── cli.py
+│   ├── generator.py
+│   └── generate_cli.py
 └── tests/
     ├── __init__.py
     ├── test_parser.py
-    └── test_validator.py
+    ├── test_validator.py
+    └── test_generator.py
 ```
 
 > `main.py` created by `uv init` should be removed — it is not part of this project.
@@ -128,6 +131,22 @@ Build the project incrementally, completing and verifying each phase before movi
   - Example CLI output (success, failure, unreadable file)
   - Development setup (clone, `uv` commands for deps, tests, linting)
 - **Verify:** README renders correctly and all commands shown are accurate
+
+### Phase 8 — Schema Generation
+
+- Implement `generator.py` with `generate_schema(env: dict[str, str]) -> str`
+  - For each key in the env dict (in insertion order), emit a line `KEY=string` if the value is non-empty, or `KEY=optional|string` if the value is empty
+  - Always infer type as `string` — no type inference
+  - Returns a string containing the full schema content, with one line per key and a trailing newline
+- Implement `generate_cli.py` with the `dotenv-schema-generate` click command
+  - Single positional argument: `env_file` (path to a `.env` file)
+  - Required flag: `--output` / `-o` (path to write the generated `.schema.env` file)
+  - Loads the `.env` file using `parse_env_file()`, calls `generate_schema()`, and writes the result to the output path
+  - Catches `ValueError` and `OSError` from parsing/writing and prints a clean error message, then exits with code `1`
+  - On success, prints: `✅ Schema written to <output_path>`
+- Add new entry point in `pyproject.toml`: `dotenv-schema-generate = "dotenv_schema_validator.generate_cli:main"`
+- Write `tests/test_generator.py`
+- **Verify:** `uv run dotenv-schema-generate --help` shows correct usage; `uv run pytest` passes; `uv run mypy dotenv_schema_validator` passes; `uv run ruff format --check dotenv_schema_validator tests` reports no changes needed
 
 ---
 
@@ -300,6 +319,23 @@ Exports:
 - Catches `ValueError` and `FileNotFoundError` from the parser and prints a clean error message
 - Exits with code `1` if any file fails
 
+### `generator.py`
+
+Exports:
+- `generate_schema(env: dict[str, str]) -> str`
+  - Iterates over the env dict in insertion order
+  - For each key: emits `KEY=string` if the value is non-empty, or `KEY=optional|string` if the value is empty
+  - Returns the full schema as a string with a trailing newline
+
+### `generate_cli.py`
+
+- Uses `click` to define the CLI
+- Installed as the command `dotenv-schema-generate` via `pyproject.toml`
+- Accepts a single positional `env_file` argument and a required `--output` / `-o` flag
+- Parses the env file using `parse_env_file()`, generates a schema using `generate_schema()`, and writes the result to the output path
+- Catches `ValueError` and `OSError` and prints a clean error message, then exits with code `1`
+- On success, prints: `✅ Schema written to <output_path>`
+
 ---
 
 ## Validation Rules
@@ -354,6 +390,7 @@ dependencies = [
 
 [project.scripts]
 dotenv-validate = "dotenv_schema_validator.cli:main"
+dotenv-schema-generate = "dotenv_schema_validator.generate_cli:main"
 
 [dependency-groups]
 dev = [
@@ -414,3 +451,16 @@ testpaths = ["tests"]
 - `enum` fails when value is not in the list, and error message includes the actual value
 - Multiple errors across keys are all reported in a single `ValidationResult`
 - Empty schema file causes a warning message on stderr and exits with code `0`
+
+### `test_cli.py`
+
+- A non-empty value produces `KEY=string`
+- An empty value produces `KEY=optional|string`
+- Output preserves insertion order of keys
+- Multiple keys are all emitted, each on its own line
+- Output ends with a trailing newline
+- An empty dict produces an empty string (just a trailing newline — i.e., `""` or `"\n"`)
+- CLI writes a `.schema.env` file to the output path on success
+- CLI prints `✅ Schema written to <output_path>` on success
+- CLI exits with code `1` and prints an error when the env file does not exist
+- CLI exits with code `1` and prints an error when the env file is malformed
