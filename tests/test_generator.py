@@ -4,7 +4,6 @@ from click.testing import CliRunner
 from dotenv_schema_validator.generate_cli import main
 from dotenv_schema_validator.generator import generate_schema
 
-
 # ---------------------------------------------------------------------------
 # generate_schema() unit tests
 # ---------------------------------------------------------------------------

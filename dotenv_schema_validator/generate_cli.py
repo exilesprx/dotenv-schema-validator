@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 
 import click
 
@@ -27,8 +28,7 @@ def main(output: str, env_file: str) -> None:
     schema_content = generate_schema(env)
 
     try:
-        with open(output, "w") as f:
-            f.write(schema_content)
+        Path(output).write_text(schema_content)
     except OSError as e:
         click.echo(f"✗ Failed to write '{output}': {e}")
         sys.exit(1)

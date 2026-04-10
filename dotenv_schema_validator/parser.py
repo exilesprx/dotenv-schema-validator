@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 _VALID_KEY_RE = re.compile(r"^[A-Z0-9_]+$")
+_MIN_QUOTED_LEN = 2
 
 
 @dataclass
@@ -19,7 +20,7 @@ class FieldSchema:
 def parse_env_file(path: str | Path) -> dict[str, str]:
     """Parse a .env file and return a dict of key/value pairs."""
     result: dict[str, str] = {}
-    with open(path) as f:
+    with Path(path).open() as f:
         for lineno, raw in enumerate(f, start=1):
             line = raw.strip()
             if not line or line.startswith("#"):
@@ -35,7 +36,7 @@ def parse_env_file(path: str | Path) -> dict[str, str]:
                 raise ValueError(
                     f"Line {lineno}: key '{key}' must be uppercase (A-Z, 0-9, _)"
                 )
-            if len(value) >= 2 and (
+            if len(value) >= _MIN_QUOTED_LEN and (
                 (value.startswith('"') and value.endswith('"'))
                 or (value.startswith("'") and value.endswith("'"))
             ):
@@ -82,10 +83,10 @@ def _parse_rule(key: str, raw_rule: str) -> FieldSchema:
                 raise ValueError(f"key '{key}': enum must have at least one value")
         else:
             for part in args_str.split(","):
-                part = part.strip()
-                if "=" not in part:
-                    raise ValueError(f"key '{key}': malformed constraint '{part}'")
-                cname, _, cval = part.partition("=")
+                stripped = part.strip()
+                if "=" not in stripped:
+                    raise ValueError(f"key '{key}': malformed constraint '{stripped}'")
+                cname, _, cval = stripped.partition("=")
                 constraints[cname.strip()] = cval.strip()
     elif type_name == "enum":
         raise ValueError(f"key '{key}': enum must have at least one value")
@@ -102,7 +103,7 @@ def _parse_rule(key: str, raw_rule: str) -> FieldSchema:
 def parse_schema_file(path: str | Path) -> dict[str, FieldSchema]:
     """Parse a .schema.env file and return a dict of key to FieldSchema."""
     result: dict[str, FieldSchema] = {}
-    with open(path) as f:
+    with Path(path).open() as f:
         for lineno, raw in enumerate(f, start=1):
             line = raw.strip()
             if not line or line.startswith("#"):

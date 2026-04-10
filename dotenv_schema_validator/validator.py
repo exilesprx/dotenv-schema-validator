@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
-from dotenv_schema_validator.parser import FieldSchema
+if TYPE_CHECKING:
+    from dotenv_schema_validator.parser import FieldSchema
 
 _BOOL_TRUE = frozenset({"true", "1", "yes", "on"})
 _BOOL_FALSE = frozenset({"false", "0", "no", "off"})
@@ -121,20 +123,21 @@ def _validate_enum(key: str, value: str, schema: FieldSchema) -> ValidationError
 def _validate_value(
     key: str, value: str, schema: FieldSchema
 ) -> ValidationError | None:
-    if schema.type == "string":
-        return _validate_string(key, value, schema)
-    if schema.type == "int":
-        return _validate_int(key, value, schema)
-    if schema.type == "float":
-        return _validate_float(key, value, schema)
-    if schema.type == "bool":
-        return _validate_bool(key, value)
-    if schema.type == "url":
-        return _validate_url(key, value)
-    if schema.type == "email":
-        return _validate_email(key, value)
-    if schema.type == "enum":
-        return _validate_enum(key, value, schema)
+    if schema.type in ("string", "int", "float", "enum"):
+        dispatch = {
+            "string": _validate_string,
+            "int": _validate_int,
+            "float": _validate_float,
+            "enum": _validate_enum,
+        }
+        return dispatch[schema.type](key, value, schema)
+    simple_dispatch = {
+        "bool": _validate_bool,
+        "url": _validate_url,
+        "email": _validate_email,
+    }
+    if schema.type in simple_dispatch:
+        return simple_dispatch[schema.type](key, value)
     return None  # unreachable given parser validation, but satisfies mypy
 
 
