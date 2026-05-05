@@ -123,14 +123,15 @@ def _validate_enum(key: str, value: str, schema: FieldSchema) -> ValidationError
 def _validate_value(
     key: str, value: str, schema: FieldSchema
 ) -> ValidationError | None:
-    if schema.type in ("string", "int", "float", "enum"):
-        dispatch = {
-            "string": _validate_string,
-            "int": _validate_int,
-            "float": _validate_float,
-            "enum": _validate_enum,
-        }
+    dispatch = {
+        "string": _validate_string,
+        "int": _validate_int,
+        "float": _validate_float,
+        "enum": _validate_enum,
+    }
+    if schema.type in dispatch:
         return dispatch[schema.type](key, value, schema)
+
     simple_dispatch = {
         "bool": _validate_bool,
         "url": _validate_url,
